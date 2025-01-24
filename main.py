@@ -3,7 +3,7 @@ import sys
 
 pygame.init()
 
-SCREEN_WIDTH, SCREEN_HEIGHT = 800, 400
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
 PIPE_SIZE = 100
 FPS = 60
 WHITE = (255, 255, 255)
@@ -26,6 +26,11 @@ pipe_images = [pygame.transform.scale(img, (PIPE_SIZE, PIPE_SIZE)) for img in pi
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Трубопроводчик')
 
+font = pygame.font.Font(None, 70)
+text_lvl1 = font.render('Level 1', True, WHITE)
+text_lvl2 = font.render('Level 2', True, WHITE)
+text_lvl3 = font.render('Level 3', True, WHITE)
+
 
 def render_map(map_data, pipe_images):
     pipe_dict = {
@@ -44,6 +49,14 @@ def render_map(map_data, pipe_images):
             if cell in pipe_dict:
                 screen.blit(pipe_dict[cell], (j * PIPE_SIZE, i * PIPE_SIZE))
 
+    pygame.draw.rect(screen, (0, 128, 128), (130, 410, 190, 160), 0)
+    pygame.draw.rect(screen, (127, 255, 212), (350, 410, 190, 160), 0)
+    pygame.draw.rect(screen, (0, 191, 255), (570, 410, 190, 160), 0)
+
+    screen.blit(text_lvl1, (140, 420))
+    screen.blit(text_lvl2, (360, 420))
+    screen.blit(text_lvl3, (580, 420))
+
 
 def load_map(filename):
     with open(filename, 'r', encoding='utf-8') as file:
@@ -57,6 +70,8 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            pass
 
     screen.blit(background_image, (0, 0))
     # for i in range(4):
