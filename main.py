@@ -1,6 +1,22 @@
 import pygame
 import sys
 
+
+def load_map(filename):
+    with open(filename, 'r', encoding='utf-8') as file:
+        return [line.strip() for line in file]
+
+
+def check_button_click(pos):
+    if 130 <= pos[0] <= 320 and 410 <= pos[1] <= 570:
+        return 'LVL1_MAP'
+    elif 350 <= pos[0] <= 540 and 410 <= pos[1] <= 570:
+        return 'LVL2_MAP'
+    elif 570 <= pos[0] <= 760 and 410 <= pos[1] <= 570:
+        return 'LVL3_MAP'
+    return None
+
+
 pygame.init()
 
 SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
@@ -58,11 +74,7 @@ def render_map(map_data, pipe_images):
     screen.blit(text_lvl3, (580, 420))
 
 
-def load_map(filename):
-    with open(filename, 'r', encoding='utf-8') as file:
-        return [line.strip() for line in file]
-
-
+current_map_file = 'LVL3_MAP'
 clock = pygame.time.Clock()
 running = True
 
@@ -71,14 +83,12 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            pass
+            new_map = check_button_click(event.pos)
+            if new_map:
+                current_map_file = new_map
 
     screen.blit(background_image, (0, 0))
-    # for i in range(4):
-    #     for j in range(8):
-    #         screen.blit(pipe_images[j], ((j) * 100, (i) * 100))
-
-    map_data = load_map('LVL3_MAP')
+    map_data = load_map(current_map_file)
     render_map(map_data, pipe_images)
 
     pygame.display.flip()
