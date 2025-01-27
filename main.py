@@ -1,5 +1,6 @@
 import pygame
 import sys
+import random
 
 
 def load_map(filename):
@@ -10,6 +11,17 @@ def load_map(filename):
 def save_map(filename, map_data):
     with open(filename, 'w', encoding='utf-8') as file:
         file.writelines(''.join(row) + '\n' for row in map_data)
+
+
+def restore_original_maps():
+    original_files = ['LVL1_MAP_ORIGINAL', 'LVL2_MAP_ORIGINAL', 'LVL3_MAP_ORIGINAL']
+    current_files = ['LVL1_MAP', 'LVL2_MAP', 'LVL3_MAP']
+
+    for original, current in zip(original_files, current_files):
+        with open(original, 'r', encoding='utf-8') as src:
+            content = src.read()
+        with open(current, 'w', encoding='utf-8') as dest:
+            dest.write(content)
 
 
 def check_button_click(pos):
@@ -38,6 +50,16 @@ def rotate_pipe(pipe):
         '*': '@'  # поворот правониз -> левониз
     }
     return rotation_map.get(pipe, pipe)  # вернуть обновленный символ или оставить без изменений
+
+
+def randomize_pipes(map_data):
+    for i, row in enumerate(map_data):
+        for j, cell in enumerate(row):
+            if cell in ('-', '/', '@', '%', '*', ':'):
+                rotations = random.randint(0, 3)
+                for _ in range(rotations):
+                    cell = rotate_pipe(cell)
+                map_data[i][j] = cell
 
 
 pygame.init()
@@ -101,6 +123,7 @@ current_map_file = 'LVL1_MAP'
 clock = pygame.time.Clock()
 running = True
 map_data = load_map(current_map_file)
+randomize_pipes(map_data)
 
 while running:
     for event in pygame.event.get():
@@ -117,6 +140,7 @@ while running:
                 save_map(current_map_file, map_data)  # сохраняем текущую карту перед загрузкой новой
                 current_map_file = new_map
                 map_data = load_map(current_map_file)
+                randomize_pipes(map_data)  # случайное поворачивание труб при загрузке нового уровня
 
     screen.blit(background_image, (0, 0))
     render_map(map_data, pipe_images)
@@ -125,4 +149,5 @@ while running:
     clock.tick(FPS)
 
 pygame.quit()
+restore_original_maps()
 sys.exit()
