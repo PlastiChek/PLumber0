@@ -4,7 +4,12 @@ import sys
 
 def load_map(filename):
     with open(filename, 'r', encoding='utf-8') as file:
-        return [line.strip() for line in file]
+        return [list(line.strip()) for line in file]
+
+
+def save_map(filename, map_data):
+    with open(filename, 'w', encoding='utf-8') as file:
+        file.writelines(''.join(row) + '\n' for row in map_data)
 
 
 def check_button_click(pos):
@@ -15,6 +20,24 @@ def check_button_click(pos):
     elif 570 <= pos[0] <= 760 and 410 <= pos[1] <= 570:
         return 'LVL3_MAP'
     return None
+
+
+def get_clicked_pipe(pos):
+    x, y = pos
+    row, col = y // PIPE_SIZE, x // PIPE_SIZE
+    return row, col
+
+
+def rotate_pipe(pipe):
+    rotation_map = {
+        '-': '/',  # горизонт -> вертикаль
+        '/': '-',  # вертикаль -> горизонт
+        '@': ':',  # поворот левониз -> левовверх
+        ':': '%',  # поворот левовверх -> правовверх
+        '%': '*',  # поворот правовверх -> правониз
+        '*': '@'  # поворот правониз -> левониз
+    }
+    return rotation_map.get(pipe, pipe)  # вернуть обновленный символ или оставить без изменений
 
 
 pygame.init()
@@ -74,21 +97,28 @@ def render_map(map_data, pipe_images):
     screen.blit(text_lvl3, (580, 420))
 
 
-current_map_file = 'LVL3_MAP'
+current_map_file = 'LVL1_MAP'
 clock = pygame.time.Clock()
 running = True
+map_data = load_map(current_map_file)
 
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:  # левая кнопка мыши
+                row, col = get_clicked_pipe(event.pos)
+                if 0 <= row < len(map_data) and 0 <= col < len(map_data[row]):
+                    map_data[row][col] = rotate_pipe(map_data[row][col])
+
             new_map = check_button_click(event.pos)
             if new_map:
+                save_map(current_map_file, map_data)  # сохраняем текущую карту перед загрузкой новой
                 current_map_file = new_map
+                map_data = load_map(current_map_file)
 
     screen.blit(background_image, (0, 0))
-    map_data = load_map(current_map_file)
     render_map(map_data, pipe_images)
 
     pygame.display.flip()
