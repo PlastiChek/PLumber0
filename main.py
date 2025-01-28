@@ -14,8 +14,8 @@ def save_map(filename, map_data):
 
 
 def restore_original_maps():
-    original_files = ['LVL1_MAP_ORIGINAL', 'LVL2_MAP_ORIGINAL', 'LVL3_MAP_ORIGINAL']
-    current_files = ['LVL1_MAP', 'LVL2_MAP', 'LVL3_MAP']
+    original_files = ['levels_data/LVL1_MAP_ORIGINAL', 'levels_data/LVL2_MAP_ORIGINAL', 'levels_data/LVL3_MAP_ORIGINAL']
+    current_files = ['levels_data/LVL1_MAP', 'levels_data/LVL2_MAP', 'levels_data/LVL3_MAP']
 
     for original, current in zip(original_files, current_files):
         with open(original, 'r', encoding='utf-8') as src:
@@ -26,11 +26,11 @@ def restore_original_maps():
 
 def check_button_click(pos):
     if 130 <= pos[0] <= 320 and 410 <= pos[1] <= 570:
-        return 'LVL1_MAP'
+        return 'levels_data/LVL1_MAP'
     elif 350 <= pos[0] <= 540 and 410 <= pos[1] <= 570:
-        return 'LVL2_MAP'
+        return 'levels_data/LVL2_MAP'
     elif 570 <= pos[0] <= 760 and 410 <= pos[1] <= 570:
-        return 'LVL3_MAP'
+        return 'levels_data/LVL3_MAP'
     return None
 
 
@@ -119,7 +119,7 @@ def render_map(map_data, pipe_images):
     screen.blit(text_lvl3, (580, 420))
 
 
-current_map_file = 'LVL1_MAP'
+current_map_file = 'levels_data/LVL1_MAP'
 clock = pygame.time.Clock()
 running = True
 map_data = load_map(current_map_file)
