@@ -14,8 +14,9 @@ def save_map(filename, map_data):
 
 
 def restore_original_maps():
-    original_files = ['levels_data/LVL1_MAP_ORIGINAL', 'levels_data/LVL2_MAP_ORIGINAL', 'levels_data/LVL3_MAP_ORIGINAL']
-    current_files = ['levels_data/LVL1_MAP', 'levels_data/LVL2_MAP', 'levels_data/LVL3_MAP']
+    original_files = ['data/levels_data/LVL1_MAP_ORIGINAL', 'data/levels_data/LVL2_MAP_ORIGINAL',
+                      'data/levels_data/LVL3_MAP_ORIGINAL']
+    current_files = ['data/levels_data/LVL1_MAP', 'data/levels_data/LVL2_MAP', 'data/levels_data/LVL3_MAP']
 
     for original, current in zip(original_files, current_files):
         with open(original, 'r', encoding='utf-8') as src:
@@ -26,11 +27,11 @@ def restore_original_maps():
 
 def check_button_click(pos):
     if 130 <= pos[0] <= 320 and 410 <= pos[1] <= 570:
-        return 'levels_data/LVL1_MAP'
+        return 'data/levels_data/LVL1_MAP'
     elif 350 <= pos[0] <= 540 and 410 <= pos[1] <= 570:
-        return 'levels_data/LVL2_MAP'
+        return 'data/levels_data/LVL2_MAP'
     elif 760 >= pos[0] >= 570 >= pos[1] >= 410:
-        return 'levels_data/LVL3_MAP'
+        return 'data/levels_data/LVL3_MAP'
     return None
 
 
@@ -97,17 +98,17 @@ if __name__ == "__main__":
     WHITE = (255, 255, 255)
 
     pipe_images = [
-        pygame.image.load('data/plumb1 (1).png'),
-        pygame.image.load('data/plumb6.png'),
-        pygame.image.load('data/plumb2 (1).png'),
-        pygame.image.load('data/plumb3 (1).png'),
-        pygame.image.load('data/plumb4 (1).png'),
-        pygame.image.load('data/plumb5 (1).png'),
-        pygame.image.load('data/plumb_start.png'),
-        pygame.image.load('data/plumb_end.png')
+        pygame.image.load('data/assets/straight_pipe_90.png'),
+        pygame.image.load('data/assets/straight_pipe_0.png'),
+        pygame.image.load('data/assets/corner_pipe_270.png'),
+        pygame.image.load('data/assets/corner_pipe_180.png'),
+        pygame.image.load('data/assets/corner_pipe_90.png'),
+        pygame.image.load('data/assets/corner_pipe_0.png'),
+        pygame.image.load('data/assets/plumb_start.png'),
+        pygame.image.load('data/assets/plumb_end.png')
     ]
-    fon = pygame.image.load('data/top-view-soil (1).jpg')
-    cursor = pygame.image.load('data/wrench.jpg')  # TODO: поменять формат курсора на пнг и добавить convert_alpha()
+    fon = pygame.image.load('data/assets/background.jpg')
+    cursor = pygame.image.load('data/assets/wrench.png')
     background_image = pygame.transform.scale(fon, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     pipe_images = [pygame.transform.scale(img, (PIPE_SIZE, PIPE_SIZE)) for img in pipe_images]
@@ -120,7 +121,7 @@ if __name__ == "__main__":
     text_lvl2 = font.render('Level 2', True, WHITE)
     text_lvl3 = font.render('Level 3', True, WHITE)
 
-    current_map_file = 'levels_data/LVL1_MAP'
+    current_map_file = 'data/levels_data/LVL1_MAP'
     clock = pygame.time.Clock()
     running = True
     map_data = load_map(current_map_file)
