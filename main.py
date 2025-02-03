@@ -110,6 +110,8 @@ if __name__ == "__main__":
     fon = pygame.image.load('data/assets/background.jpg')
     cursor = pygame.image.load('data/assets/wrench.png')
     background_image = pygame.transform.scale(fon, (SCREEN_WIDTH, SCREEN_HEIGHT))
+    pygame.mixer.init()
+    sound = pygame.mixer.Sound('data/assets/test_sound.mp3')
 
     pipe_images = [pygame.transform.scale(img, (PIPE_SIZE, PIPE_SIZE)) for img in pipe_images]
 
@@ -134,6 +136,7 @@ if __name__ == "__main__":
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # левая кнопка мыши
                     row, col = get_clicked_pipe(event.pos)
+                    channel = sound.play()
                     if 0 <= row < len(map_data) and 0 <= col < len(map_data[row]):
                         map_data[row][col] = rotate_pipe(map_data[row][col])
 
