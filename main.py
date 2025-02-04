@@ -3,6 +3,43 @@ import sys
 import random
 
 
+def terminate():
+    pygame.quit()
+    sys.exit()
+
+
+def start_screen():
+    intro_text = ["ЗАСТАВКА", "",
+                  "Правила игры",
+                  "Если в правилах несколько строк,",
+                  "приходится выводить их построчно"]
+
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 30)
+    text_coord = 50
+    for line in intro_text:
+        string_rendered = font.render(line, 1, pygame.Color(WHITE))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                channel = sound.play()
+                return
+        if pygame.mouse.get_focused():
+            pygame.mouse.set_cursor((0, 0), cursor)
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
 def load_map(filename):
     with open(filename, 'r', encoding='utf-8') as file:
         return [list(line.strip()) for line in file]
@@ -23,6 +60,17 @@ def restore_original_maps():
             content = src.read()
         with open(current, 'w', encoding='utf-8') as dest:
             dest.write(content)
+
+
+#TODO: функция вызывает себя, пока не найдёт конец трубы
+#def check_water(map_data: list):
+#    for i in range(len(map_data)):
+#        for j in range(len(map_data[i])):
+#            if map_data[i][j] == '$':
+#                x = j
+#                y = i
+#    if map_data[x + 1, y] == '@' or map_data[x + 1, y] == ':' or map_data[x + 1, y] == '-':
+#        pass
 
 
 def check_button_click(pos):
@@ -96,6 +144,9 @@ if __name__ == "__main__":
     PIPE_SIZE = 100
     FPS = 60
     WHITE = (255, 255, 255)
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    pygame.display.set_caption('Трубопроводчик')
+    clock = pygame.time.Clock()
 
     pipe_images = [
         pygame.image.load('data/assets/straight_pipe_90.png'),
@@ -113,10 +164,9 @@ if __name__ == "__main__":
     pygame.mixer.init()
     sound = pygame.mixer.Sound('data/assets/test_sound.mp3')
 
-    pipe_images = [pygame.transform.scale(img, (PIPE_SIZE, PIPE_SIZE)) for img in pipe_images]
+    start_screen()
 
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption('Трубопроводчик')
+    pipe_images = [pygame.transform.scale(img, (PIPE_SIZE, PIPE_SIZE)) for img in pipe_images]
 
     font = pygame.font.Font(None, 70)
     text_lvl1 = font.render('Level 1', True, WHITE)
@@ -124,7 +174,6 @@ if __name__ == "__main__":
     text_lvl3 = font.render('Level 3', True, WHITE)
 
     current_map_file = 'data/levels_data/LVL1_MAP'
-    clock = pygame.time.Clock()
     running = True
     map_data = load_map(current_map_file)
     randomize_pipes(map_data)
@@ -153,7 +202,5 @@ if __name__ == "__main__":
 
         pygame.display.flip()
         clock.tick(FPS)
-
-    pygame.quit()
     restore_original_maps()
-    sys.exit()
+    terminate()
