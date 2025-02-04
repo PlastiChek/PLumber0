@@ -62,15 +62,56 @@ def restore_original_maps():
             dest.write(content)
 
 
-#TODO: функция вызывает себя, пока не найдёт конец трубы
-#def check_water(map_data: list):
-#    for i in range(len(map_data)):
-#        for j in range(len(map_data[i])):
-#            if map_data[i][j] == '$':
-#                x = j
-#                y = i
-#    if map_data[x + 1, y] == '@' or map_data[x + 1, y] == ':' or map_data[x + 1, y] == '-':
-#        pass
+def start_checking(map_data):
+    for i in range(len(map_data)):
+        for j in range(len(map_data[i])):
+            if map_data[i][j] == '$':
+                check_water(i, j, 1)
+                return
+
+
+def check_water(x, y, rotation):
+    try:
+        if rotation == 4:
+            print('You win!\n'*1000)
+            return
+        elif rotation == 0:
+            next_pipe = map_data[x - 1][y]
+            rotations = {
+                '@': 3,
+                '/': 0,
+                '*': 1
+            }
+            check_water(x - 1, y, rotations[next_pipe])
+        elif rotation == 1:
+            next_pipe = map_data[x][y + 1]
+            rotations = {
+                ':': 0,
+                '-': 1,
+                '@': 2,
+                '!': 4
+            }
+            check_water(x, y + 1, rotations[next_pipe])
+        elif rotation == 2:
+            next_pipe = map_data[x + 1][y]
+            rotations = {
+                '%': 1,
+                '/': 2,
+                ':': 3
+            }
+            check_water(x + 1, y, rotations[next_pipe])
+        elif rotation == 3:
+            next_pipe = map_data[x][y - 1]
+            rotations = {
+                '*': 2,
+                '-': 3,
+                '%': 0
+            }
+            check_water(x, y - 1, rotations[next_pipe])
+    except KeyError:
+        return
+    except IndexError:
+        return
 
 
 def check_button_click(pos):
@@ -204,8 +245,11 @@ if __name__ == "__main__":
                     current_map_file = new_map
                     map_data = load_map(current_map_file)
                     randomize_pipes(map_data)  # случайное поворачивание труб при загрузке нового уровня
-            if pygame.mouse.get_focused():
-                pygame.mouse.set_cursor((0, 0), cursor)
+        if pygame.mouse.get_focused():
+            pygame.mouse.set_cursor((0, 0), cursor)
+
+        start_checking(map_data)
+
         screen.blit(background_image, (0, 0))
         render_map(map_data, pipe_images)
 
