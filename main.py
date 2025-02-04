@@ -128,9 +128,13 @@ def render_map(map_data, pipe_images):
             if cell in pipe_dict:
                 screen.blit(pipe_dict[cell], (j * PIPE_SIZE, i * PIPE_SIZE))
 
-    pygame.draw.rect(screen, (0, 128, 128), (130, 410, 190, 160), 0)
-    pygame.draw.rect(screen, (127, 255, 212), (350, 410, 190, 160), 0)
-    pygame.draw.rect(screen, (0, 191, 255), (570, 410, 190, 160), 0)
+    pygame.draw.rect(screen, (211, 222, 237), (120, 400, 210, 180), 0)
+    pygame.draw.rect(screen, (189, 189, 189), (340, 400, 210, 180), 0)
+    pygame.draw.rect(screen, (110, 110, 110), (560, 400, 210, 180), 0)
+
+    screen.blit(level1_intro, (130, 410))
+    screen.blit(level2_intro, (350, 410))
+    screen.blit(level3_intro, (570, 410))
 
     screen.blit(text_lvl1, (140, 420))
     screen.blit(text_lvl2, (360, 420))
@@ -143,6 +147,7 @@ if __name__ == "__main__":
     SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
     PIPE_SIZE = 100
     FPS = 60
+    BROWN = (77, 34, 14)
     WHITE = (255, 255, 255)
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption('Трубопроводчик')
@@ -163,6 +168,10 @@ if __name__ == "__main__":
     background_image = pygame.transform.scale(fon, (SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.mixer.init()
     sound = pygame.mixer.Sound('data/assets/test_sound.mp3')
+
+    level1_intro = pygame.image.load('data/assets/level1.0.png')
+    level2_intro = pygame.image.load('data/assets/level2.0.png')
+    level3_intro = pygame.image.load('data/assets/level3.0.png')
 
     start_screen()
 
