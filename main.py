@@ -1,6 +1,7 @@
 import pygame
 import sys
 import random
+import time
 
 
 def terminate():
@@ -9,20 +10,26 @@ def terminate():
 
 
 def start_screen():
-    intro_text = ["ЗАСТАВКА", "",
-                  "Правила игры",
-                  "Если в правилах несколько строк,",
-                  "приходится выводить их построчно"]
+    first_line = "Правила игры"
+    intro_text = ["Нажимайте левой кнопкой мышки",
+                  "на трубу, чтобы её повернуть"]
 
-    screen.blit(fon, (0, 0))
-    font = pygame.font.Font(None, 30)
-    text_coord = 50
+    screen.blit(start_background, (0, 0))
+    screen.blit(metal_plate, (120, 90))
+    font = pygame.font.Font(None, 60)
+    string_rendered = font.render(first_line, 1, pygame.Color(WHITE))
+    intro_rect = string_rendered.get_rect()
+    intro_rect.x = 250
+    text_coord = 100
+    intro_rect.top = text_coord
+    screen.blit(string_rendered, intro_rect)
+    font = pygame.font.Font(None, 40)
     for line in intro_text:
         string_rendered = font.render(line, 1, pygame.Color(WHITE))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
-        intro_rect.top = text_coord
-        intro_rect.x = 10
+        intro_rect.top = text_coord + 50
+        intro_rect.x = 150
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
 
@@ -66,23 +73,21 @@ def start_checking(map_data):
     for i in range(len(map_data)):
         for j in range(len(map_data[i])):
             if map_data[i][j] == '$':
-                check_water(i, j, 1)
-                return
+                return check_water(i, j, 1)
 
 
 def check_water(x, y, rotation):
     try:
         if rotation == 4:
-            print('You win!\n'*1000)
-            return
+            return win_sequence()
         elif rotation == 0:
             next_pipe = map_data[x - 1][y]
             rotations = {
                 '@': 3,
                 '/': 0,
-                '*': 1
+                '*': 1,
             }
-            check_water(x - 1, y, rotations[next_pipe])
+            return check_water(x - 1, y, rotations[next_pipe])
         elif rotation == 1:
             next_pipe = map_data[x][y + 1]
             rotations = {
@@ -91,7 +96,7 @@ def check_water(x, y, rotation):
                 '@': 2,
                 '!': 4
             }
-            check_water(x, y + 1, rotations[next_pipe])
+            return check_water(x, y + 1, rotations[next_pipe])
         elif rotation == 2:
             next_pipe = map_data[x + 1][y]
             rotations = {
@@ -99,7 +104,7 @@ def check_water(x, y, rotation):
                 '/': 2,
                 ':': 3
             }
-            check_water(x + 1, y, rotations[next_pipe])
+            return check_water(x + 1, y, rotations[next_pipe])
         elif rotation == 3:
             next_pipe = map_data[x][y - 1]
             rotations = {
@@ -107,11 +112,32 @@ def check_water(x, y, rotation):
                 '-': 3,
                 '%': 0
             }
-            check_water(x, y - 1, rotations[next_pipe])
+            return check_water(x, y - 1, rotations[next_pipe])
     except KeyError:
         return
     except IndexError:
         return
+
+
+def win_sequence():
+    channel = win_sound.play()
+    start_time = time.time()
+    while time.time() - start_time < 3:
+        screen.blit(background_image, (0, 0))
+        render_map(map_data, pipe_images)
+
+        cur_time = time.time() - start_time
+        if int(cur_time * 2) % 2 == 0:
+            screen.blit(shine_1, (0, 0))
+        else:
+            screen.blit(shine_2, (0, 0))
+
+        screen.blit(win, (100, 100))
+
+        pygame.display.flip()
+        pygame.time.delay(500)
+
+    return True
 
 
 def check_button_click(pos):
@@ -205,10 +231,17 @@ if __name__ == "__main__":
         pygame.image.load('data/assets/plumb_end.png')
     ]
     fon = pygame.image.load('data/assets/background.jpg')
+    start_bg = pygame.image.load('data/assets/start_background.jpg')
     cursor = pygame.image.load('data/assets/wrench.png')
+    metal_plate = pygame.image.load('data/assets/metal_plate.jpg')
+    win = pygame.image.load('data/assets/winner.png')
+    shine_1 = pygame.image.load('data/assets/shine1.png')
+    shine_2 = pygame.image.load('data/assets/shine2.png')
     background_image = pygame.transform.scale(fon, (SCREEN_WIDTH, SCREEN_HEIGHT))
+    start_background = pygame.transform.scale(start_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.mixer.init()
-    sound = pygame.mixer.Sound('data/assets/test_sound.mp3')
+    sound = pygame.mixer.Sound('data/assets/click_sound.mp3')
+    win_sound = pygame.mixer.Sound('data/assets/win_sound.mp3')
 
     level1_intro = pygame.image.load('data/assets/level1.0.png')
     level2_intro = pygame.image.load('data/assets/level2.0.png')
@@ -225,6 +258,7 @@ if __name__ == "__main__":
 
     current_map_file = 'data/levels_data/LVL1_MAP'
     running = True
+    level_complete = False
     map_data = load_map(current_map_file)
     randomize_pipes(map_data)
 
@@ -238,6 +272,8 @@ if __name__ == "__main__":
                     channel = sound.play()
                     if 0 <= row < len(map_data) and 0 <= col < len(map_data[row]):
                         map_data[row][col] = rotate_pipe(map_data[row][col])
+                        if not level_complete:
+                            level_complete = start_checking(map_data)
 
                 new_map = check_button_click(event.pos)
                 if new_map:
@@ -245,10 +281,9 @@ if __name__ == "__main__":
                     current_map_file = new_map
                     map_data = load_map(current_map_file)
                     randomize_pipes(map_data)  # случайное поворачивание труб при загрузке нового уровня
+                    level_complete = False
         if pygame.mouse.get_focused():
             pygame.mouse.set_cursor((0, 0), cursor)
-
-        start_checking(map_data)
 
         screen.blit(background_image, (0, 0))
         render_map(map_data, pipe_images)
